@@ -1,5 +1,6 @@
 package ma.majrisalma.transactionservice.service;
 
+import ma.majrisalma.transactionservice.client.AccountClient;
 import ma.majrisalma.transactionservice.domain.Transaction;
 import ma.majrisalma.transactionservice.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ import java.util.UUID;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final AccountClient accountClient;
 
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, AccountClient accountClient) {
         this.transactionRepository = transactionRepository;
+        this.accountClient = accountClient;
     }
 
     public Transaction createTransaction(UUID accountId, BigDecimal amount, String type) {
@@ -25,7 +28,16 @@ public class TransactionService {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Transaction amount must be positive");
         }
+        try {
+            Object account = accountClient.getAccountById(accountId);
+            if (account == null) {
+                throw new IllegalArgumentException("Account not found with ID: " + accountId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error communicating with Account Service or Account does not exist", e);
+        }
 
+        // 3. Creation d la transaction
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID());
         transaction.setAccountId(accountId);
