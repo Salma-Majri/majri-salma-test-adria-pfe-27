@@ -1,7 +1,12 @@
 package ma.majrisalma.transactionservice.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -11,16 +16,12 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
 
+    @Id
+    private UUID id;
     private UUID accountId;
     private BigDecimal amount;
-    private String currency;
-    private String merchantCategory;
-    private String country;
-    private Instant createdAt;
+    private String type;
+    private Instant timestamp;
 }
